@@ -21,15 +21,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.tarea_n2.ui.components.BotonForm
 import com.example.tarea_n2.ui.components.Icono
+import com.example.tarea_n2.ui.model.Category
 import com.example.tarea_n2.ui.navigation.Detail
 import com.example.tarea_n2.ui.navigation.FormCategory
 import com.example.tarea_n2.ui.navigation.FormEvent
@@ -37,7 +41,8 @@ import com.example.tarea_n2.ui.screens.form.FormViewModelCategory
 import com.example.tarea_n2.ui.screens.form.FormViewModelEvent
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: FormViewModelCategory, viewModeltwo: FormViewModelEvent){
+fun HomeScreen(navController: NavController, viewModeltwo: FormViewModelEvent, viewModel: FormViewModelCategory = hiltViewModel()){
+    val categoria by viewModel.listCategory.collectAsStateWithLifecycle()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -81,20 +86,20 @@ fun HomeScreen(navController: NavController, viewModel: FormViewModelCategory, v
         }
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            GridCards(navController, viewModel, viewModeltwo)
+            GridCards(navController, categoria, viewModeltwo)
         }
     }
 }
 
 @Composable
-fun GridCards(navController: NavController, viewModel: FormViewModelCategory, viewModeltwo: FormViewModelEvent) {
+fun GridCards(navController: NavController, categorias: List<Category>, viewModeltwo: FormViewModelEvent) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(horizontal = 50.dp, vertical = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        viewModel.listCategory.forEach { categoria ->
+        categorias.forEach { categoria ->
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icono(icono = Icons.Default.DateRange)

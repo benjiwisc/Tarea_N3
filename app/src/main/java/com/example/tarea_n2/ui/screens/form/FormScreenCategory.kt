@@ -13,17 +13,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.tarea_n2.ui.components.BotonForm
 import com.example.tarea_n2.ui.components.Icono
 import com.example.tarea_n2.ui.components.InputForm
 import com.example.tarea_n2.ui.navigation.Home
+import kotlinx.coroutines.launch
 
 @Composable
-fun FormScreenCategory(navController: NavHostController, formViewModel: FormViewModelCategory) {
+fun FormScreenCategory(navController: NavHostController, formViewModel: FormViewModelCategory = hiltViewModel()) {
+    val scope = rememberCoroutineScope()
+
     Scaffold() { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding).fillMaxSize(),
@@ -59,7 +64,9 @@ fun FormScreenCategory(navController: NavHostController, formViewModel: FormView
 
             BotonForm(
                 texto = "Añadir Categoria",
-                onClick = { formViewModel.addCategory() }
+                onClick = {
+                    scope.launch {formViewModel.addCategory()}
+                }
             )
 
             Spacer(modifier = Modifier.size(12.dp))

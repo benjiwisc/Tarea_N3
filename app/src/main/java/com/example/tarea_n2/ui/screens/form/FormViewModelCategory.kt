@@ -4,30 +4,46 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.tarea_n2.data.repository.category.CategoryRepository
+import com.example.tarea_n2.ui.model.Category
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class FormViewModelCategory : ViewModel(){
+@HiltViewModel
+class FormViewModelCategory @Inject constructor(
+    private val categoryRepository: CategoryRepository
+): ViewModel(){
     var nombre by mutableStateOf("")
     var encargado by mutableStateOf("")
-    var listCategory = mutableListOf<Category>()
-    var ultimoid = 0
-
     var nombreError by mutableStateOf<String?>(null)
     var encargadoError by mutableStateOf<String?>(null)
+    val listCategory: StateFlow<List<Category>> = categoryRepository.obtenerTodasCategorias()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     init {
-        cargarDatos()
+        viewModelScope.launch {
+            cargarDatos()
+        }
     }
 
     fun cargarDatos() {
-
-        val datos = listOf(
-            Category(1, "Conciertos", "Juan Perez"),
-            Category(2, "Conferencias", "Ana Garcia"),
-            Category(3, "Talleres", "Carlos Ruiz")
-        )
-
-        listCategory.addAll(datos)
-        ultimoid = datos.size
+        viewModelScope.launch {
+            val existente = categoryRepository.buscarPorNombre("Conciertos")
+            if (existente == null) {
+                categoryRepository.insertarCategoria(Category(nombre="Conciertos", encargado="Juan Perez"))
+                categoryRepository.insertarCategoria(Category(nombre="Conferencias", encargado="Ana Garcia"))
+                categoryRepository.insertarCategoria(Category(nombre="Talleres", encargado="Carlos Ruiz"))
+            }
+        }
     }
 
     fun validar(): Boolean {
@@ -43,12 +59,20 @@ class FormViewModelCategory : ViewModel(){
 
     fun addCategory(){
         if(validar()) {
-            ultimoid++
-            listCategory.add(Category(ultimoid, nombre, encargado))
-            nombre = ""
-            encargado = ""
+            viewModelScope.launch {
+                val categorynew = Category(
+                    nombre = nombre,
+                    encargado = encargado
+                )
+                categoryRepository.insertarCategoria(categorynew)
+                resetForm()
+            }
         }
+    }
+
+    fun resetForm() {
+        nombre = ""
+        encargado = ""
     }
 }
 
-class Category(val id:Int, val nombre: String, val encargado: String)

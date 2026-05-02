@@ -30,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.tarea_n2.ui.components.BotonForm
 import com.example.tarea_n2.ui.components.Icono
@@ -40,10 +42,10 @@ import com.example.tarea_n2.ui.navigation.Home
 fun FormScreenEvent(
     navController: NavHostController, 
     viewModel: FormViewModelEvent,
-    categoryViewModel: FormViewModelCategory
+    categoryViewModel: FormViewModelCategory = hiltViewModel()
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    val categoria by categoryViewModel.listCategory.collectAsStateWithLifecycle()
     Scaffold() { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding).fillMaxSize(),
@@ -89,7 +91,7 @@ fun FormScreenEvent(
                     onDismissRequest = { expanded = false },
                     modifier = Modifier.fillMaxWidth(0.8f)
                 ) {
-                    categoryViewModel.listCategory.forEach { category ->
+                    categoria.forEach { category ->
                         DropdownMenuItem(
                             text = { Text(category.nombre) },
                             onClick = {

@@ -1,6 +1,7 @@
 package com.example.tarea_n2.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,20 +30,19 @@ data class Detail(val eventId: Int)
 @Composable
 fun Navigation(){
     val navController = rememberNavController()
-    val viewModel: FormViewModelCategory = viewModel()
     val viewModeltwo: FormViewModelEvent = viewModel()
 
     NavHost(navController = navController, startDestination = Home){
         composable<Home> {
-            HomeScreen(navController, viewModel, viewModeltwo)
+            HomeScreen(navController,viewModeltwo)
         }
 
         composable<FormCategory> {
-            FormScreenCategory(navController, viewModel)
+            FormScreenCategory(navController)
         }
 
         composable<FormEvent> {
-            FormScreenEvent(navController, viewModeltwo, viewModel)
+            FormScreenEvent(navController, viewModeltwo)
         }
 
         composable<Detail> { backStackEntry ->
