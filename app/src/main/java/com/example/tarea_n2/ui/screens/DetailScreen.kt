@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,14 +39,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.tarea_n2.R
 import com.example.tarea_n2.ui.screens.form.FormViewModelEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavController, eventId: Int, viewModel: FormViewModelEvent) {
-    val event = viewModel.listEvent.find { it.id == eventId }
+fun DetailScreen(
+    navController: NavController, 
+    eventId: Int, 
+    viewModel: FormViewModelEvent = hiltViewModel()
+) {
+    val events by viewModel.listEvent.collectAsStateWithLifecycle()
+    val event = events.find { it.id == eventId }
 
     Scaffold(
         topBar = {
@@ -104,20 +112,6 @@ fun DetailScreen(navController: NavController, eventId: Int, viewModel: FormView
                 Text("Evento no encontrado")
             }
         }
-    }
-}
-
-@Composable
-fun BoxPlaceholder(text: String = "Imagen del Evento") {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = text, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

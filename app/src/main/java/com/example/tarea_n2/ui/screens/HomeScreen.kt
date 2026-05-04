@@ -34,6 +34,7 @@ import androidx.navigation.NavController
 import com.example.tarea_n2.ui.components.BotonForm
 import com.example.tarea_n2.ui.components.Icono
 import com.example.tarea_n2.ui.model.Category
+import com.example.tarea_n2.ui.model.Event
 import com.example.tarea_n2.ui.navigation.Detail
 import com.example.tarea_n2.ui.navigation.FormCategory
 import com.example.tarea_n2.ui.navigation.FormEvent
@@ -41,8 +42,14 @@ import com.example.tarea_n2.ui.screens.form.FormViewModelCategory
 import com.example.tarea_n2.ui.screens.form.FormViewModelEvent
 
 @Composable
-fun HomeScreen(navController: NavController, viewModeltwo: FormViewModelEvent, viewModel: FormViewModelCategory = hiltViewModel()){
-    val categoria by viewModel.listCategory.collectAsStateWithLifecycle()
+fun HomeScreen(
+    navController: NavController,
+    viewModelEvent: FormViewModelEvent = hiltViewModel(),
+    viewModelCategory: FormViewModelCategory = hiltViewModel()
+) {
+    val categorias by viewModelCategory.listCategory.collectAsStateWithLifecycle()
+    val eventos by viewModelEvent.listEvent.collectAsStateWithLifecycle()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -86,13 +93,13 @@ fun HomeScreen(navController: NavController, viewModeltwo: FormViewModelEvent, v
         }
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            GridCards(navController, categoria, viewModeltwo)
+            GridCards(navController, categorias, eventos)
         }
     }
 }
 
 @Composable
-fun GridCards(navController: NavController, categorias: List<Category>, viewModeltwo: FormViewModelEvent) {
+fun GridCards(navController: NavController, categorias: List<Category>, eventos: List<Event>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(horizontal = 50.dp, vertical = 20.dp),
@@ -112,7 +119,7 @@ fun GridCards(navController: NavController, categorias: List<Category>, viewMode
                 }
             }
 
-            items(viewModeltwo.listEvent.filter { it.category == categoria.nombre }) { evento ->
+            items(eventos.filter { it.category == categoria.nombre }) { evento ->
                 Card(
                     colors = CardDefaults.cardColors(),
                     onClick = { navController.navigate(Detail(evento.id)) }
